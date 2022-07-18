@@ -8,6 +8,7 @@ use frontend\models\StoredbooksSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * StoredbooksController implements the CRUD actions for Storedbooks model.
@@ -73,7 +74,6 @@ class StoredbooksController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $modela->load($this->request->post()) ) {
-
                 if($_POST['Authors']['id']==NULL)
                 {
                     return $this->redirect(['create']);
@@ -81,9 +81,22 @@ class StoredbooksController extends Controller
                 else
                 {
                     $model->authorid = $_POST['Authors']['id'];
-
-                    $model->save();
+                    $model->save(false);
                     $modela->save();
+
+                    //*******************************************************************************
+
+                    $bookid=$model->id;
+                    $image = UploadedFile::getInstance($model, 'img');
+                    if($model->img!="") {
+                        $imageName = 'book' . $bookid . '.' . $image->getExtension();
+                        $image->saveAs('D:/xampp/htdocs/knihovnakucera/images/books/' . $imageName);
+                        $model->img = $imageName;
+                    }
+                    else{
+                        $model->img = "default.png";
+                    }
+                    $model->save();
 
                     return $this->redirect(['view', 'id' => $model->id]);
                 }
@@ -112,8 +125,34 @@ class StoredbooksController extends Controller
         $model = $this->findModel($id);
         $modela = new Authors();
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isPost && $model->load($this->request->post()) && $modela->load($this->request->post())) {
+            if($_POST['Authors']['id']==NULL)   //pokud je pri updatu nevyplneny autor, tak update neprobehne.
+            {
+                return $this->redirect(['update','id' => $model->id]);
+            }
+            else {
+                $model->authorid = $_POST['Authors']['id'];
+                $model->save(false);
+                $modela->save();
+
+                //*******************************************************************************
+
+                $bookid = $model->id;
+                $image = UploadedFile::getInstance($model, 'img');
+
+                if($image) {   //pokud je fileinput vyplnen, tak probehne. V pripade, ze ne, tak se provede else a nastavi se defaultni foto
+                    $imageName = 'book' . $bookid . '.' . $image->getExtension();
+                    $image->saveAs('D:/xampp/htdocs/knihovnakucera/images/books/' . $imageName);
+                    $model->img = $imageName;
+                }
+                else{
+                    $model->img = "default.png";
+                }
+
+                $model->save();
+
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -131,6 +170,10 @@ class StoredbooksController extends Controller
      */
     public function actionDelete($id)
     {
+        $data = Storedbooks::findOne($id);
+        if($data->img != "default.png")
+            unlink('D:/xampp/htdocs/knihovnakucera/images/books/' . $data->img);
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
