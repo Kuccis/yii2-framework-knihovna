@@ -13,7 +13,7 @@ use frontend\models\Authors;
 
 <div class="storedbooks-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['options'=>['enctype'=>'multipart/form-data']]); ?>
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
@@ -53,6 +53,8 @@ use frontend\models\Authors;
 
         echo $form->field($modela, 'id')->dropDownList($authorsMap, ['prompt'=>'Vyberte autora knihy']);
     ?>
+
+    <?= $form->field($model, 'img')->fileInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Potvrdit akci', ['class' => 'btn btn-success']) ?>
