@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $jmeno
  * @property string $prijmeni
+ * @property string $img
  */
 class Authors extends \yii\db\ActiveRecord
 {
@@ -28,7 +29,7 @@ class Authors extends \yii\db\ActiveRecord
     {
         return [
             [['jmeno', 'prijmeni'], 'required'],
-            [['jmeno', 'prijmeni'], 'string', 'max' => 255],
+            [['jmeno', 'prijmeni', 'img'], 'string', 'max' => 255],
         ];
     }
 
@@ -41,6 +42,7 @@ class Authors extends \yii\db\ActiveRecord
             'id' => 'Autor',
             'jmeno' => 'Jméno',
             'prijmeni' => 'Příjmení',
+            'img' => 'Náhledová fotografie',
         ];
     }
 

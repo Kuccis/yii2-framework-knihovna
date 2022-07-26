@@ -2,7 +2,11 @@
 
 namespace frontend\controllers;
 
+use Yii;
+use yii\base\Model;
+
 use frontend\models\Authors;
+use frontend\models\Borrowedbooks;
 use frontend\models\Storedbooks;
 use frontend\models\StoredbooksSearch;
 use yii\web\Controller;
@@ -188,10 +192,84 @@ class StoredbooksController extends Controller
      */
     protected function findModel($id)
     {
-        if (($model = Storedbooks::findOne(['id' => $id])) !== null) {
+        $url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+        $modela = Borrowedbooks::findOne(['idbook' => $id]);
+        //
+
+        if (($model = Storedbooks::findOne(['id' => $id])) !== null && strpos($url,'view') != false) {
+            return $model;
+        }
+        else if($modela->iduser == Yii::$app->user->id)
+        {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
+     * Zobrazi stranku pro zapujceni knihy
+     * @param int $id ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionBorrow($id)
+    {
+        return $this->render('borrow', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+    /**
+     * Zapise ke knize v databázi hodnotu 1, která představuje vypůjčení knihy, pricte pocet pujceni,
+     * vytvori novy zaznam v databazi borrowedbooks, ktery uchova po dobu pujceni potrebna data
+     * @param int $id ID
+     * @return \yii\web\Response
+     */
+    public function actionPujcit($id)
+    {
+        $model=Storedbooks::findOne(['id' => $id]);
+        $modela=new Borrowedbooks();
+        $datum=date("Y-m-d");
+        $mod_date = strtotime($datum."+ 14 days");
+
+        $modela->idbook=$model->id;
+        $modela->iduser=Yii::$app->user->getId();
+        $modela->fromdate=date($datum);
+        $modela->untildate=date("Y-m-d",$mod_date);
+
+        $model->borrowed = 1;
+        $model->borrowedcount++;
+
+        $model->save();
+        $modela->save();
+
+        return $this->redirect(['index']);
+    }
+    /**
+     * Zobrazi stranku pro vraceni knihy
+     * @param int $id ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionReturnbook($id)
+    {
+        return $this->render('returnbook', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+    /**
+     * Zapise ke knize v databázi hodnotu 0, která představuje vracenou knihu
+     * smaze zaznam z tabulky borrowedbooks (neni uz potreba)
+     * @param int $id ID
+     * @return \yii\web\Response
+     */
+    public function actionVratit($id)
+    {
+        $model=Storedbooks::findOne(['id' => $id]);
+        Borrowedbooks::deleteAll(['idbook'=>$model->id]);
+        $model->borrowed = 0;
+        $model->save();
+
+        return $this->redirect(['index']);
     }
 }

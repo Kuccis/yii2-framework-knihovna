@@ -16,9 +16,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'prijmeni')->textInput(['maxlength' => true]) ?>
 
-    <div class="form-group">
-        <?= Html::submitButton('Přidat', ['class' => 'btn btn-success']) ?>
+    <?= $form->field($model, 'img')->fileInput() ?>
 
+    <div class="form-group">
         <?= Html::a('Zpět', ['/authors/index'], ['class'=>'btn btn-secondary']) ?>
     </div>
 

@@ -40,6 +40,13 @@ AppAsset::register($this);
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
+        $menuItems = [
+            ['label' => 'Úvodní strana', 'url' => ['/site/index']],
+            ['label' => 'Knihovna', 'url' => ['/storedbooks/index']],
+            ['label' => 'Správa autorů', 'url' => ['/authors/index']],
+            ['label' => 'Evidence knih', 'url' => ['/borrowedbooks/index']],
+            ['label' => 'Seznam uživatelů', 'url' => ['/user/index']],
+        ];
         $menuItems[] = '<li>'
             . Html::beginForm(['/site/logout'], 'post', ['class' => 'form-inline'])
             . Html::submitButton(
@@ -50,7 +57,7 @@ AppAsset::register($this);
             . '</li>';
     }
     echo Nav::widget([
-        'options' => ['class' => 'navbar-nav'],
+        'options' => ['class' => 'navbar-nav ml-auto'],
         'items' => $menuItems,
     ]);
     NavBar::end();

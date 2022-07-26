@@ -7,6 +7,7 @@ use frontend\models\AuthorsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * AuthorsController implements the CRUD actions for Authors model.
@@ -70,7 +71,19 @@ class AuthorsController extends Controller
         $model = new Authors();
 
         if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
+            if ($model->load($this->request->post())) {
+
+                $image = UploadedFile::getInstance($model, 'img');
+                if($image) {
+                    $imageName = 'author' . $model->id . '.' . $image->getExtension();
+                    $image->saveAs('D:/xampp/htdocs/knihovnakucera/images/authors/' . $imageName);
+                    $model->img = $imageName;
+                }
+                else{
+                    $model->img = "default.png";
+                }
+                $model->save();
+
                 return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
@@ -93,7 +106,18 @@ class AuthorsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $image = UploadedFile::getInstance($model, 'img');
+            if($image) {
+                $imageName = 'author' . $model->id . '.' . $image->getExtension();
+                $image->saveAs('D:/xampp/htdocs/knihovnakucera/images/authors/' . $imageName);
+                $model->img = $imageName;
+            }
+            else{
+                $model->img = "default.png";
+            }
+            $model->save();
+
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

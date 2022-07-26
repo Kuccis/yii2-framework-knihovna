@@ -14,16 +14,6 @@ $this->title = $model->name;
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Upravit knihu', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Odstranit knihu', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Opravdu chcete odstranit tuto knihu?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
     <div class="row">
         <div class="col-lg-3">
             <?php
@@ -47,6 +37,10 @@ $this->title = $model->name;
                     [
                         'label' => 'Stav zapůjčení',
                         'value' => ($model->borrowed == 0) ? "Volné" : "Vypůjčené",
+                    ],
+                    [
+                        'label' => 'Počet zapůjčení',
+                        'value' => $model->borrowedcount."x",
                     ],
                     [
                         'label' => 'Autor',

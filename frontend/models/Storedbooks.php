@@ -2,6 +2,7 @@
 
 namespace frontend\models;
 
+use common\models\User;
 use Yii;
 
 /**
@@ -10,8 +11,12 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $genre
- * @property boolean $borrowed
+ * @property int $borrowed
+ * @property int $borrowedcount
+ * @property string $img
  * @property int $authorid
+ *
+ * @property Authors $author
  */
 class Storedbooks extends \yii\db\ActiveRecord
 {
@@ -30,9 +35,9 @@ class Storedbooks extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'genre', 'authorid'], 'required'],
-            [['authorid'], 'integer'],
-            [['borrowed'], 'boolean'],
-            [['name', 'genre'], 'string', 'max' => 255],
+            [['borrowed', 'borrowedcount', 'authorid'], 'integer'],
+            [['name', 'genre', 'img'], 'string', 'max' => 255],
+            [['authorid'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['authorid' => 'id']],
         ];
     }
 
@@ -46,9 +51,22 @@ class Storedbooks extends \yii\db\ActiveRecord
             'name' => 'Název',
             'genre' => 'Žánr',
             'borrowed' => 'Stav půjčení',
+            'borrowedcount' => 'Půjčeno',
             'authorid' => 'Autor',
+            'img' => 'Nahrajte náhledovou fotografii',
         ];
     }
+
+    /**
+     * Gets query for [[Author]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAuthor()
+    {
+        return $this->hasOne(Authors::className(), ['id' => 'authorid']);
+    }
+
     public function getBorrowedLabel()
     {
         return $this->borrowed ? 'Vypůjčené' : 'Volné';
