@@ -3,9 +3,11 @@
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 use frontend\models\Authors;
+use frontend\models\Borrowedbooks;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Storedbooks */
+/* @var $modela frontend\models\Borrowedbooks */
 
 $this->title = $model->name;
 \yii\web\YiiAsset::register($this);
@@ -16,13 +18,23 @@ $this->title = $model->name;
 
     <p>
         <?= Html::a('Upravit knihu', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Odstranit knihu', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Opravdu chcete odstranit tuto knihu?',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?php
+            $modela=Borrowedbooks::findOne(['idbook' => $model->id]);
+            if(!$modela)
+            {
+                echo Html::a('Odstranit knihu', ['delete', 'id' => $model->id], [
+                        'class' => 'btn btn-danger',
+                        'data' => [
+                            'confirm' => 'Jste si jistí, že chcete odstranit knihu?',
+                            'method' => 'post',
+                        ],
+                    ]);
+            }
+            else
+            {
+                echo Html::button('Nelze odstranit knihu', ['class' => 'btn disabled btn-danger']);
+            }
+        ?>
     </p>
     <div class="row">
         <div class="col-lg-3">

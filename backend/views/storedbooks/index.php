@@ -4,11 +4,15 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use rmrevin\yii\fontawesome\FA;
+use frontend\models\Borrowedbooks;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\StoredbooksSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 /* @var $model frontend\models\Storedbooks */
+
+rmrevin\yii\fontawesome\AssetBundle::register($this);
 
 $this->title = 'Knihovna';
 ?>
@@ -42,10 +46,21 @@ $this->title = 'Knihovna';
 
             ],
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'label' => 'Stav zapůjčení',
+
+                'content' => function($model) {
+                    $modela = Borrowedbooks::findOne(['idbook' => $model->id]);
+                    if($modela)
+                        return "Vypůjčeno";
+                    else
+                        return "Volné";
+                }
+            ],
+            [
+                'header' => ' ',
+                'content' => function($model) {
+                    return Html::a(FA::icon('eye').' Zobrazit', ['view','id' => $model->id]);
+                }
             ],
         ],
     ]); ?>

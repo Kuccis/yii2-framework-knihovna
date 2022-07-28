@@ -5,6 +5,7 @@ use yii\widgets\DetailView;
 use yii\grid\GridView;
 use yii\data\ActiveDataProvider;
 use yii\grid\ActionColumn;
+use frontend\models\Borrowedbooks;
 
 /* @var $this yii\web\View */
 /* @var $model backend\models\User */
@@ -20,14 +21,24 @@ $this->title = 'Uživatel-podrobnosti';
     <h1>Uživatel: <?=$model->username?></h1>
 
     <p>
-        <?= Html::a('Zabanovat uživatele', ['update', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
-        <?= Html::a('Odstranit uživatele', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Jste si jistí, že chcete tento uživatelský účet odstranit? Akce je nenávratná',
-                'method' => 'post',
-            ],
-        ]) ?>
+        <?php
+            $modela=Borrowedbooks::findOne(['iduser' => $model->id]);
+            if(!$modela)
+            {
+                echo Html::a('Odstranit uživatele', ['delete', 'id' => $model->id], [
+                        'class' => 'btn btn-danger',
+                        'data' => [
+                            'confirm' => 'Jste si jistí, že chcete odstranit uživatele?',
+                            'method' => 'post',
+                        ],
+                    ]);
+            }
+            else
+            {
+                echo Html::button('Nelze odstranit uživatele', ['class' => 'btn disabled btn-danger']);
+            }
+        ?>
+        <?= Html::a('Zpět', ['index'], ['class'=>'btn btn-secondary']) ?>
     </p>
 
     <?= DetailView::widget([

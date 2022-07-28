@@ -7,7 +7,7 @@ use frontend\models\Authors;
 use frontend\models\Storedbooks;
 
 /* @var $this yii\web\View */
-/* @var $model backend\models\Borrowedbooks */
+/* @var $model frontend\models\Borrowedbooks */
 /* @var $img frontend\models\Storedbooks */
 /* @var $user frontend\models\Authors */
 
@@ -83,7 +83,7 @@ use frontend\models\Storedbooks;
             ]) ?>
 
             <?=
-            Html::a('Vrátit knihu', ['vratit', 'id' => $model->id], [
+            Html::a('Vrátit knihu', ['delete', 'id' => $model->id], [
                 'class' => 'btn btn-warning',
                 'data' => [
                     'confirm' => 'Opravdu chcete vrátit tuto knihu?',
