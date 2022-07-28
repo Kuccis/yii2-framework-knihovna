@@ -16,9 +16,22 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'prijmeni')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'img')->fileInput() ?>
-
-    <div class="form-group">
+    <?php
+    if($model->img == "default.png")
+        {
+            echo $form->field($model, 'img')->fileInput();
+        }
+        else{
+            echo Html::a('Odstranit fotografii', ['odstranitfoto', 'id' => $model->id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Opravdu chcete odstranit fotografii?',
+                    'method' => 'post',
+                ],
+            ]);
+        }
+    ?>
+    <div class="form-group" style="margin-top:20px;">
         <?= Html::submitButton('Přidat', ['class' => 'btn btn-success']) ?>
 
         <?= Html::a('Zpět', ['/authors/index'], ['class'=>'btn btn-secondary']) ?>

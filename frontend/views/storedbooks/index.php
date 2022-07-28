@@ -35,14 +35,6 @@ $this->title = 'Knihovna';
             'name',
             'genre',
             [
-                'attribute' => 'borrowed',
-
-                'filter' => [0=>'Volné', 1=>'Vypůjčené'],
-
-                'value' => 'borrowedLabel',
-
-            ],
-            [
                 'attribute' => 'borrowedcount',
 
                 'content' => function($model) {
@@ -68,10 +60,10 @@ $this->title = 'Knihovna';
 
                 'content' => function($model) {
                     $modelPujcene=Borrowedbooks::findOne(['idbook' => $model->id]);
-                    if($model->borrowed == 0) {
+                    if(empty($modelPujcene)) {
                         return Html::a(FA::icon('s fa-archive') . ' Půjčit knihu', ['borrow', 'id' => $model->id], ['class' => 'btn btn-link', 'style' => 'padding:0']);
                     }
-                    else if($model->borrowed == 1 && Yii::$app->user->getId() != $modelPujcene->iduser) {
+                    else if(!empty($modelPujcene) && Yii::$app->user->getId() != $modelPujcene->iduser) {
                         return Html::button(FA::icon('s fa-archive') . ' Půjčit knihu', ['class' => 'btn btn-link disabled', 'style' => 'padding:0']);
                     }
                     else if(Yii::$app->user->getId() == $modelPujcene->iduser){

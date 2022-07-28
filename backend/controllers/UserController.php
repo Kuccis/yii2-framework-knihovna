@@ -7,6 +7,9 @@ use backend\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\base\Exception;
+use yii\base\Model;
+use Yii;
 
 /**
  * UserController implements the CRUD actions for User model.
@@ -38,13 +41,19 @@ class UserController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if(Yii::$app->user->identity != NULL) {
+            $searchModel = new UserSearch();
+            $dataProvider = $searchModel->search($this->request->queryParams);
+    
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -55,9 +64,15 @@ class UserController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if(Yii::$app->user->identity != NULL) {
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -67,19 +82,25 @@ class UserController extends Controller
      */
     public function actionCreate()
     {
-        $model = new User();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if(Yii::$app->user->identity != NULL) {
+            $model = new User();
+    
+            if ($this->request->isPost) {
+                if ($model->load($this->request->post()) && $model->save()) {
+                    return $this->redirect(['view', 'id' => $model->id]);
+                }
+            } else {
+                $model->loadDefaultValues();
             }
-        } else {
-            $model->loadDefaultValues();
+    
+            return $this->render('create', [
+                'model' => $model,
+            ]);
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -91,15 +112,21 @@ class UserController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if(Yii::$app->user->identity != NULL) {
+            $model = $this->findModel($id);
+    
+            if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
+    
+            return $this->render('update', [
+                'model' => $model,
+            ]);
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -111,9 +138,15 @@ class UserController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        if(Yii::$app->user->identity != NULL) {
+            $this->findModel($id)->delete();
+    
+            return $this->redirect(['index']);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**

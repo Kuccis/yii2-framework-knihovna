@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
 use frontend\models\Authors;
+use frontend\models\Storedbooks;
 
 /* @var $this yii\web\View */
 /* @var $model frontend\models\Storedbooks */
@@ -50,13 +51,33 @@ use frontend\models\Authors;
                 return $authors->getFullName();
             }
         );
-
+        
+        $url = 'http://' . $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'];
+        if(strpos($url,'create') != true){
+            $pom=Storedbooks::findOne(['id' => $_GET['id']]);
+            $modela->id = $pom->authorid;
+        }
+        else{
+            $modela->id = '';
+        }
         echo $form->field($modela, 'id')->dropDownList($authorsMap, ['prompt'=>'Vyberte autora knihy']);
+        
+        if($model->img == "default.png")
+        {
+            echo $form->field($model, 'img')->fileInput();
+        }
+        else{
+            echo Html::a('Odstranit fotografii', ['odstranitfoto', 'id' => $model->id], [
+                'class' => 'btn btn-danger',
+                'data' => [
+                    'confirm' => 'Opravdu chcete odstranit fotografii?',
+                    'method' => 'post',
+                ],
+            ]);
+        }
     ?>
 
-    <?= $form->field($model, 'img')->fileInput() ?>
-
-    <div class="form-group">
+    <div class="form-group" style="margin-top:20px;">
         <?= Html::submitButton('Potvrdit akci', ['class' => 'btn btn-success']) ?>
 
         <?= Html::a('Zpět', ['index'], ['class'=>'btn btn-secondary']) ?>

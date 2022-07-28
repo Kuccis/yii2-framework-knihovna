@@ -31,7 +31,7 @@ $this->title = $model->name;
             ->where(['id' => $model->authorid])
             ->one();
             ?>
-            <?php echo Html::img('/../knihovnakucera/images/books/'.$model->img, [
+            <?php echo Html::img('/../knihovnakucera/frontend/images/books/'.$model->img, [
             'alt' => 'Nahledovy obrazek knihy',
             'width' => '250px',
             'height' => '350px',
@@ -44,10 +44,6 @@ $this->title = $model->name;
                 'attributes' => [
                     'name',
                     'genre',
-                    [
-                        'label' => 'Stav zapůjčení',
-                        'value' => ($model->borrowed == 0) ? "Volné" : "Vypůjčené",
-                    ],
                     [
                         'label' => 'Počet zapůjčení',
                         'value' => $model->borrowedcount."x",

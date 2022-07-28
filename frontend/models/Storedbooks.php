@@ -11,7 +11,6 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string $genre
- * @property int $borrowed
  * @property int $borrowedcount
  * @property string $img
  * @property int $authorid
@@ -35,7 +34,7 @@ class Storedbooks extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'genre', 'authorid'], 'required'],
-            [['borrowed', 'borrowedcount', 'authorid'], 'integer'],
+            [['borrowedcount', 'authorid'], 'integer'],
             [['name', 'genre', 'img'], 'string', 'max' => 255],
             [['authorid'], 'exist', 'skipOnError' => true, 'targetClass' => Authors::className(), 'targetAttribute' => ['authorid' => 'id']],
         ];
@@ -50,7 +49,6 @@ class Storedbooks extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Název',
             'genre' => 'Žánr',
-            'borrowed' => 'Stav půjčení',
             'borrowedcount' => 'Půjčeno',
             'authorid' => 'Autor',
             'img' => 'Nahrajte náhledovou fotografii',
@@ -65,11 +63,6 @@ class Storedbooks extends \yii\db\ActiveRecord
     public function getAuthor()
     {
         return $this->hasOne(Authors::className(), ['id' => 'authorid']);
-    }
-
-    public function getBorrowedLabel()
-    {
-        return $this->borrowed ? 'Vypůjčené' : 'Volné';
     }
     public function getAuthorLabel()
     {

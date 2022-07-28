@@ -17,7 +17,7 @@ $this->title = "Autor: ".$model->jmeno." ".$model->prijmeni;
 
     <div class="row">
         <div class="col-lg-3">
-            <?php echo Html::img('/../knihovnakucera/images/authors/'.$model->img, [
+            <?php echo Html::img('/../knihovnakucera/frontend/images/authors/'.$model->img, [
             'alt' => 'Nahledovy obrazek knihy',
             'width' => '250px',
             'height' => '300px',

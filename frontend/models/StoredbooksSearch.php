@@ -17,7 +17,7 @@ class StoredbooksSearch extends Storedbooks
     public function rules()
     {
         return [
-            [['id', 'borrowed'], 'integer'],
+            [['id',], 'integer'],
             [['name', 'genre'], 'safe'],
         ];
     }
@@ -59,7 +59,6 @@ class StoredbooksSearch extends Storedbooks
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'borrowed' => $this->borrowed,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

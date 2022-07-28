@@ -4,6 +4,7 @@ namespace frontend\controllers;
 
 use frontend\models\Borrowedbooks;
 use frontend\models\BorrowedbooksSearch;
+use frontend\models\Storedbooks;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -111,6 +112,12 @@ class BorrowedbooksController extends Controller
      */
     public function actionDelete($id)
     {
+        $model = $this->findModel($id);
+
+        $data = Storedbooks::findOne($model->idbook);
+        $data->borrowed=0;
+        $data->save();
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

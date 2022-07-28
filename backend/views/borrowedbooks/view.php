@@ -31,7 +31,7 @@ use frontend\models\Storedbooks;
                 ->where(['id' => $model->iduser])
                 ->one();
             ?>
-            <?php echo Html::img('/../knihovnakucera/images/books/'.$img->img, [
+            <?php echo Html::img('/../knihovnakucera/frontend/images/books/'.$img->img, [
                 'alt' => 'Nahledovy obrazek knihy',
                 'width' => '250px',
                 'height' => '350px',

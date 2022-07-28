@@ -4,10 +4,13 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use rmrevin\yii\fontawesome\FA;
 
 /* @var $this yii\web\View */
 /* @var $searchModel frontend\models\AuthorsSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
+
+rmrevin\yii\fontawesome\AssetBundle::register($this);
 
 $this->title = 'Přidat autora do seznamu';
 ?>
@@ -30,10 +33,10 @@ $this->title = 'Přidat autora do seznamu';
             'jmeno',
             'prijmeni',
             [
-                'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'header' => ' ',
+                'content' => function($model) {
+                    return Html::a(FA::icon('eye').' Zobrazit', ['view','id' => $model->id]);
+                }
             ],
         ],
     ]); ?>

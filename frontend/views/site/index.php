@@ -35,10 +35,13 @@ $this->title = 'Knihovna Kučera';
 
     <div class="jumbotron text-center bg-transparent">
         <h1 class="display-4">Vítejte v knihovně Kučera!</h1>
-
-        <p class="lead">V naší nabídce naleznete různé knihy, které si můžete vypůjčit! Stačí se pouze registrovat</p>
-
-        <p><a class="btn btn-lg btn-primary" href="index.php?r=site%2Fsignup">Registrovat se</a></p>
+        <?php
+            if(Yii::$app->user->identity == NULL) {
+            echo '
+            <p class="lead">V naší nabídce naleznete různé knihy, které si můžete vypůjčit! Stačí se pouze registrovat</p>
+            <p><a class="btn btn-lg btn-primary" href="index.php?r=site%2Fsignup">Registrovat se</a></p>';
+            }
+        ?>
     </div>
 
     <hr>

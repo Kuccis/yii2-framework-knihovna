@@ -19,7 +19,6 @@ $this->title = 'Knihovna';
     <p>
         <?= Html::a('Přidat knihu', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -28,14 +27,6 @@ $this->title = 'Knihovna';
 
             'name',
             'genre',
-            [
-                'attribute' => 'borrowed',
-
-                'filter' => [0=>'Volné', 1=>'Vypůjčené'],
-
-                'value' => 'borrowedLabel',
-
-            ],
             [
                 'attribute' => 'borrowedcount',
 

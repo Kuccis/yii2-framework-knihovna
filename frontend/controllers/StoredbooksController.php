@@ -13,6 +13,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
+use yii\base\Exception;
+
 
 /**
  * StoredbooksController implements the CRUD actions for Storedbooks model.
@@ -44,13 +46,19 @@ class StoredbooksController extends Controller
      */
     public function actionIndex()
     {
-        $searchModel = new StoredbooksSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
+        if(Yii::$app->user->identity != NULL) {
+            $searchModel = new StoredbooksSearch();
+            $dataProvider = $searchModel->search($this->request->queryParams);
+    
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -61,9 +69,15 @@ class StoredbooksController extends Controller
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        if(Yii::$app->user->identity != NULL) {
+            return $this->render('view', [
+                'model' => $this->findModel($id),
+            ]);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -73,48 +87,55 @@ class StoredbooksController extends Controller
      */
     public function actionCreate()
     {
-        $model = new Storedbooks();
-        $modela = new Authors();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $modela->load($this->request->post()) ) {
-                if($_POST['Authors']['id']==NULL)
-                {
-                    return $this->redirect(['create']);
-                }
-                else
-                {
-                    $model->authorid = $_POST['Authors']['id'];
-                    $model->save(false);
-                    $modela->save();
-
-                    //*******************************************************************************
-
-                    $bookid=$model->id;
-                    $image = UploadedFile::getInstance($model, 'img');
-                    if($model->img!="") {
-                        $imageName = 'book' . $bookid . '.' . $image->getExtension();
-                        $image->saveAs('D:/xampp/htdocs/knihovnakucera/images/books/' . $imageName);
-                        $model->img = $imageName;
+        if(Yii::$app->user->identity != NULL) {
+            $model = new Storedbooks();
+            $modela = new Authors();
+    
+            if ($this->request->isPost) {
+                if ($model->load($this->request->post()) && $modela->load($this->request->post()) ) {
+                    if($_POST['Authors']['id']==NULL)
+                    {
+                        return $this->redirect(['create']);
                     }
-                    else{
-                        $model->img = "default.png";
+                    else {
+                        $model->authorid = $_POST['Authors']['id'];
+                        $model->save(false);
+                        $modela->save();
+        
+                        //*******************************************************************************
+        
+                        $bookid = $model->id;
+                        $image = UploadedFile::getInstance($model, 'img');
+        
+                        if($image) {   //pokud je fileinput vyplnen, tak probehne. V pripade, ze ne, tak se provede else a nastavi se defaultni foto
+                            $imageName = 'book' . $bookid . '.' . $image->getExtension();
+                            $image->saveAs('@frontend/images/books/' . $imageName);
+                            $model->img = $imageName;
+                        }
+                        else{
+                            $model->img = "default.png";
+                        }
+        
+                        $model->save();
+        
+                        return $this->redirect(['view', 'id' => $model->id]);
                     }
-                    $model->save();
-
-                    return $this->redirect(['view', 'id' => $model->id]);
                 }
             }
+            else {
+                $model->loadDefaultValues();
+                $modela->loadDefaultValues();
+            }
+    
+            return $this->render('create', [
+                'model' => $model,
+                'modela' => $modela,
+            ]);
         }
-        else {
-            $model->loadDefaultValues();
-            $modela->loadDefaultValues();
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-            'modela' => $modela,
-        ]);
+        else
+        {
+            return $this->render('/site/index');
+        }        
     }
 
     /**
@@ -126,43 +147,49 @@ class StoredbooksController extends Controller
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $modela = new Authors();
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $modela->load($this->request->post())) {
-            if($_POST['Authors']['id']==NULL)   //pokud je pri updatu nevyplneny autor, tak update neprobehne.
-            {
-                return $this->redirect(['update','id' => $model->id]);
-            }
-            else {
-                $model->authorid = $_POST['Authors']['id'];
-                $model->save(false);
-                $modela->save();
-
-                //*******************************************************************************
-
-                $bookid = $model->id;
-                $image = UploadedFile::getInstance($model, 'img');
-
-                if($image) {   //pokud je fileinput vyplnen, tak probehne. V pripade, ze ne, tak se provede else a nastavi se defaultni foto
-                    $imageName = 'book' . $bookid . '.' . $image->getExtension();
-                    $image->saveAs('D:/xampp/htdocs/knihovnakucera/images/books/' . $imageName);
-                    $model->img = $imageName;
+        if(Yii::$app->user->identity != NULL) {
+            $model = $this->findModel($id);
+            $modela = new Authors();
+    
+            if ($this->request->isPost && $model->load($this->request->post()) && $modela->load($this->request->post())) {
+                if($_POST['Authors']['id']==NULL)   //pokud je pri updatu nevyplneny autor, tak update neprobehne.
+                {
+                    return $this->redirect(['update','id' => $model->id]);
                 }
-                else{
-                    $model->img = "default.png";
+                else {
+                    $model->authorid = $_POST['Authors']['id'];
+                    $model->save(false);
+                    $modela->save();
+    
+                    //*******************************************************************************
+    
+                    $bookid = $model->id;
+                    $image = UploadedFile::getInstance($model, 'img');
+    
+                    if($image) {   //pokud je fileinput vyplnen, tak probehne. V pripade, ze ne, tak se provede else a nastavi se defaultni foto
+                        $imageName = 'book' . $bookid . '.' . $image->getExtension();
+                        $image->saveAs('@frontend/images/books/' . $imageName);
+                        $model->img = $imageName;
+                    }
+                    else{
+                        $model->img = "default.png";
+                    }
+    
+                    $model->save();
+    
+                    return $this->redirect(['view', 'id' => $model->id]);
                 }
-
-                $model->save();
-
-                return $this->redirect(['view', 'id' => $model->id]);
             }
+    
+            return $this->render('update', [
+                'model' => $model,
+                'modela' => $modela,
+            ]);
         }
-
-        return $this->render('update', [
-            'model' => $model,
-            'modela' => $modela,
-        ]);
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 
     /**
@@ -174,13 +201,19 @@ class StoredbooksController extends Controller
      */
     public function actionDelete($id)
     {
-        $data = Storedbooks::findOne($id);
-        if($data->img != "default.png")
-            unlink('D:/xampp/htdocs/knihovnakucera/images/books/' . $data->img);
-
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        if(Yii::$app->user->identity != NULL) {
+            $data = Storedbooks::findOne($id);
+            if($data->img != "default.png")
+                unlink(\Yii::getAlias('@frontend').'/images/books/' . $data->img);
+    
+            $this->findModel($id)->delete();
+    
+            return $this->redirect(['index']);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }    
     }
 
     /**
@@ -196,7 +229,7 @@ class StoredbooksController extends Controller
         $modela = Borrowedbooks::findOne(['idbook' => $id]);
         //
 
-        if (($model = Storedbooks::findOne(['id' => $id])) !== null && strpos($url,'view') != false) {
+        if (($model = Storedbooks::findOne(['id' => $id])) !== null && strpos($url,'view') != false || strpos($url,'borrow') != false) {
             return $model;
         }
         else if($modela->iduser == Yii::$app->user->id)
@@ -215,9 +248,15 @@ class StoredbooksController extends Controller
      */
     public function actionBorrow($id)
     {
-        return $this->render('borrow', [
-            'model' => $this->findModel($id),
-        ]);
+        if(Yii::$app->user->identity != NULL) {
+            return $this->render('borrow', [
+                'model' => $this->findModel($id),
+            ]);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
     /**
      * Zapise ke knize v databázi hodnotu 1, která představuje vypůjčení knihy, pricte pocet pujceni,
@@ -227,6 +266,7 @@ class StoredbooksController extends Controller
      */
     public function actionPujcit($id)
     {
+        /*
         $model=Storedbooks::findOne(['id' => $id]);
         $modela=new Borrowedbooks();
         $datum=date("Y-m-d");
@@ -236,14 +276,43 @@ class StoredbooksController extends Controller
         $modela->iduser=Yii::$app->user->getId();
         $modela->fromdate=date($datum);
         $modela->untildate=date("Y-m-d",$mod_date);
-
-        $model->borrowed = 1;
-        $model->borrowedcount++;
-
-        $model->save();
         $modela->save();
-
-        return $this->redirect(['index']);
+        
+        $model->borrowedcount++;
+        $model->save();
+        */
+        if(Yii::$app->user->identity != NULL) {
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $model=Storedbooks::findOne(['id' => $id]);
+                $modela=new Borrowedbooks();
+                $datum=date("Y-m-d");
+                $mod_date = strtotime($datum."+ 14 days");
+    
+                $modela->idbook=$model->id;
+                $modela->iduser=Yii::$app->user->getId();
+                $modela->fromdate=date($datum);
+                $modela->untildate=date("Y-m-d",$mod_date);
+                $modela->save(false);
+    
+                $model->borrowedcount++;
+                $model->save();
+    
+                $transaction->commit();
+            } catch (\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+    
+            return $this->redirect(['index']);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
     /**
      * Zobrazi stranku pro vraceni knihy
@@ -253,9 +322,15 @@ class StoredbooksController extends Controller
      */
     public function actionReturnbook($id)
     {
-        return $this->render('returnbook', [
-            'model' => $this->findModel($id),
-        ]);
+        if(Yii::$app->user->identity != NULL) {
+            return $this->render('returnbook', [
+                'model' => $this->findModel($id),
+            ]);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
     /**
      * Zapise ke knize v databázi hodnotu 0, která představuje vracenou knihu
@@ -265,11 +340,39 @@ class StoredbooksController extends Controller
      */
     public function actionVratit($id)
     {
-        $model=Storedbooks::findOne(['id' => $id]);
-        Borrowedbooks::deleteAll(['idbook'=>$model->id]);
-        $model->borrowed = 0;
-        $model->save();
-
-        return $this->redirect(['index']);
+        if(Yii::$app->user->identity != NULL) {
+            $model=Storedbooks::findOne(['id' => $id]);
+            Borrowedbooks::deleteAll(['idbook'=>$model->id]);
+            $model->save();
+    
+            return $this->redirect(['index']);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
+    }
+    /**
+     * Odstrani foto u knihy pokud je nejaka nastavena
+     * @param int $id ID
+     * @return \yii\web\Response
+     */
+    public function actionOdstranitfoto($id)
+    {
+        if(Yii::$app->user->identity != NULL) {
+            $model=Storedbooks::findOne(['id' => $id]);
+            
+            if($model->img != "default.png")
+                unlink(\Yii::getAlias('@frontend').'/images/books/' . $model->img);
+                
+            $model->img="default.png";
+            $model->save();
+    
+            return $this->redirect(['update']);
+        }
+        else
+        {
+            return $this->render('/site/index');
+        }
     }
 }
